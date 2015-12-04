@@ -1,0 +1,64 @@
+---
+title: "Pokemon Cleanup"
+author: "Andrew Linxie"
+date: "December 3, 2015"
+output: pdf_document
+---
+Goal: Return a clean data table, types_clean.csv
+
+Packages and Working Directory
+```{r}
+#install.packages("dplyr")
+library(dplyr)
+library(readr)
+```
+
+Getting the Tables we need
+```{r}
+type_reference <- read_csv("~/rawdata/types.csv")
+pokemon_stats <- read_csv("~/rawdata/pokemon_stats.csv")
+pokemon_types <- read_csv("~/rawdata/pokemon_types.csv")
+stat_names <- read_csv("~/rawdata/stat_names.csv")
+```
+
+What Types we want
+```{r}
+types <-  c('water', 'fire', 'flying', 'ground', 'poison', 'dragon', 'dark', 'ice', 'electric', 'rock' )
+```
+
+Function to get a type given a type ID. Use the data frame, type_reference
+```{r}
+get_type_by_id <- function(id) {
+  return(type_reference[type_reference$id == id,]$identifier[1])
+}
+```
+
+Group pokemon_types by first type, get actual types from type ID. Get the number of pokemon per type to get values for the count of each type in our types table. This new type_counts table will be our current result
+```{r}
+get_first <- function(arr) {
+  return(arr[1])
+}
+pokemon_id_types <- group_by(pokemon_types, pokemon_id) %>% 
+  summarise(type_id = get_first(type_id)) %>%
+  mutate(type = sapply(type_id, get_type_by_id)) %>%
+  select(-type_id)
+
+type_counts <- group_by(pokemon_id_types, type) %>% summarise(count = length(pokemon_id)) %>% filter(type %in% types)
+result <- type_counts
+result
+```
+
+Link pokemon_id to types filtered to attack and special attack stats. Add these stats for a power metric. Group by type and add powers to get a total power metric per type
+```{r}
+stats_and_types <- left_join(pokemon_id_types,pokemon_stats) %>% filter(stat_id %in% c(2,4)) %>% group_by(pokemon_id) %>% summarise(power = sum(base_stat), type = get_first(type))
+type_power <- group_by(stats_and_types, type) %>% summarise(total_power = sum(power))
+result <- left_join(result, type_power) %>% mutate(avg_power = as.integer(floor(total_power / count)))
+result
+```
+Store clean file as types_clean.csv
+```{r}
+if (!dir.exists("./data")) dir.create("./data") 
+write.csv(x = result, file = "./data/data.csv", row.names = FALSE)
+
+```
+
