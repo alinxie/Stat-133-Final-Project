@@ -1,0 +1,155 @@
+---
+title: "FinalPresentation"
+author: "Alice Wang, Jerry Haoming Jiang, Andrew Linxie"
+date: "December 3, 2015"
+output: pdf_document
+---
+
+#Getting the Raw Data
+
+#####Set Working Directory and install packages
+####Natural Disasters Data: Cleaning, Organizing and Exporting
+```{r}
+setwd("/users/alicewang/desktop/stat133/finalproject/")
+#install.packages("dplyr")
+library(dplyr)
+library(readr)
+rawnd <- read.csv("./rawdata/naturaldisasters.csv")
+types <- c()
+type <- as.character(rawnd[,2])
+subtype <- as.character(rawnd[,3])
+subsubtype <- as.character(rawnd[,11])
+for (i in 1:155) {
+  if (subsubtype[i] == "--"|| subsubtype[i] == "") {
+    if (subtype[i] == "--") {
+      types <- c(types, type[i])
+    } else if (subtype[i] != "--") {
+      types <- c(types, subtype[i])
+    }
+  } else if (subsubtype[i] != "--") {
+    types <- c(types, subsubtype[i])
+  }
+}
+nd <- data.frame("year" = rawnd[,1], "type" = types, "casualty" = rawnd[,5]+rawnd[,6]+rawnd[,7], "cost" = rawnd[,10])
+
+if (!dir.exists("./data")) dir.create("./data") 
+file.create("./data/NaturalDisasters.csv")
+write.csv(nd,"./data/NaturalDisasters.csv")
+```
+
+
+
+
+####Economic Cost Data
+#####Process to Cleaning the Economics Data: 
+#####1) Reading in the File
+```{r}
+setwd("/users/alicewang/desktop/stat133/finalproject/")
+Raw_GDP <- read.csv("./rawdata/GDP_Data.csv", stringsAsFactors = FALSE,col.names = c("Quarter","GDP"))
+```
+#####2) Clean Data:
+#####I wanted to remove the introductory piece, specifically, where this Data was obtained from (sorry), so that only the numbers remain. 
+```{r}
+Quarterly_GDP_Data <- Raw_GDP[-1:-10,]
+Quarterly_GDP_Data <- data.frame(
+                          'Quarter' = Quarterly_GDP_Data[,1], 
+                          'GDP' = Quarterly_GDP_Data[,2], stringsAsFactors = FALSE)
+Quarterly_GDP_Data[,"GDP"] <- as.numeric(Quarterly_GDP_Data[,"GDP"])
+```
+#####3) Create Yearly GDP 
+```{r}
+Annual_GDP_Data <- data.frame(
+                      'Years' = 1995:2015,
+                      'GDP' = Quarterly_GDP_Data[c(seq(0,nrow(Quarterly_GDP_Data),by = 4),nrow(Quarterly_GDP_Data)),'GDP'])
+```
+#####4) Export Data
+```{r}
+setwd("/users/alicewang/desktop/stat133/finalproject/")
+if (!dir.exists("./data")) dir.create("./data") 
+file.create("./data/Econ.csv")
+write.csv(x = Annual_GDP_Data, file = "./data/Econ.csv", row.names = FALSE)
+
+```
+
+
+
+
+###Pokemon Data
+Goal: Return a clean data table, types.csv, containing pokemon types, the number of pokemon per type, a power metric for each type, and an average power metric per pokemon for each type
+
+Packages and Working Directory
+```{r}
+#install.packages("dplyr")
+library(dplyr)
+library(readr)
+```
+
+Getting the Tables we need
+```{r}
+setwd("/users/alicewang/desktop/stat133/finalproject/")
+type_reference <- read_csv("./rawdata/types.csv")
+pokemon_stats <- read_csv("./rawdata/pokemon_stats.csv")
+pokemon_types <- read_csv("./rawdata/pokemon_types.csv")
+stat_names <- read_csv("./rawdata/stat_names.csv")
+```
+
+What Types we want
+```{r}
+types <-  c('water', 'fire', 'flying', 'ground', 'poison', 'dragon', 'dark', 'ice', 'electric', 'rock' )
+```
+
+Function to get a type given a type ID. Use the data frame, type_reference
+```{r}
+get_type_by_id <- function(id) {
+  return(type_reference[type_reference$id == id,]$identifier[1])
+}
+```
+
+Group pokemon_types by first type, get actual types from type ID. Get the number of pokemon per type to get values for the count of each type in our types table. 
+```{r}
+get_first <- function(arr) {
+  return(arr[1])
+}
+pokemon_id_types <- group_by(pokemon_types, pokemon_id) %>% 
+  summarise(type_id = get_first(type_id)) %>%
+  mutate(type = sapply(type_id, get_type_by_id)) %>%
+  select(-type_id)
+
+type_counts <- group_by(pokemon_id_types, type) %>%
+  summarise(pokemon_count = length(pokemon_id)) %>%
+  filter(type %in% types)
+
+type_counts
+
+```
+
+Link pokemon_id to types filtered to attack and special attack stats. Add these stats for a power metric. Group by type and add powers to get a total power metric per type
+```{r}
+stats_and_types <- left_join(pokemon_id_types,pokemon_stats) %>% filter(stat_id %in% c(2,4)) %>% group_by(pokemon_id) %>% summarise(power = sum(base_stat), type = get_first(type))
+type_power <- group_by(stats_and_types, type) %>% summarise(total_power = sum(power))
+result <- left_join(type_counts, type_power) %>% mutate(avg_power = as.integer(floor(total_power / pokemon_count)))
+result
+```
+Store clean file as types_clean.csv
+```{r}
+setwd("/users/alicewang/desktop/stat133/finalproject/")
+if (!dir.exists("./data")) dir.create("./data") 
+file.create("./data/types.csv")
+write.csv(x = result, file = "./data/types.csv", row.names = FALSE)
+
+```
+
+
+
+##Exploratory Data Analysis and Modelling
+###
+```{r}
+ggplot
+```
+
+
+
+
+
+
+
