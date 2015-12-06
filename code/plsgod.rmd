@@ -1,0 +1,679 @@
+---
+title: "FinalPresentation"
+author: "Alice Wang, Jerry Haoming Jiang, Andrew Linxie"
+date: "December 3, 2015"
+output: pdf_document
+---
+
+#Getting the Raw Data
+
+#####Set Working Directory and install packages
+```{r}
+library(dplyr)
+library(readr)
+library(ggplot2)
+require(knitr)
+opts_knit$set(root.dir = "/users/alicewang/desktop/stat133/finalproject/code")
+```
+
+####Natural Disasters Data: Cleaning, Organizing and Exporting
+#####Reading in the raw data
+```{r, fig.width=3.2, fig.height = 2}
+rawnd <- read.csv("../rawdata/naturaldisasters.csv")
+```
+#####Creating the column type and specifying them precisely
+```{r, fig.width=3.2, fig.height = 2}
+types <- c()
+type <- as.character(rawnd[,2])
+subtype <- as.character(rawnd[,3])
+subsubtype <- as.character(rawnd[,11])
+for (i in 1:155) {
+  if (subsubtype[i] == "--"|| subsubtype[i] == "") {
+    if (subtype[i] == "--") {
+      types <- c(types, type[i])
+    } else if (subtype[i] != "--") {
+      types <- c(types, subtype[i])
+    }
+  } else if (subsubtype[i] != "--") {
+    types <- c(types, subsubtype[i])
+  }
+}
+```
+#####Creating the corresponding pokemon types as another column in data frame
+```{r, fig.width=3.2, fig.height = 2}
+poke_types <- c("ice","fire", "flying", "water", "water", "electric", 
+                "flying","ice", "fire", "fire","electric", "flying", "water", 
+                "fire", "ice", "ground", "ice", "poison", "rock", 
+                "fire", "fire", "ice", "dragon", "dark")
+nd_types <- c("Cold wave", "Heat wave", "Storm", "Riverine flood", 
+              "Flood","Convective storm", "Tropical cyclone", 
+              "Winter storm/Blizzard", "Forest fire", 
+              "Land fire (Brush, Bush, Pastur", "Lightning", 
+              "Tornado", "Flash flood", "Drought", "Hail", 
+              "Ground movement","Extreme temperature ", "Viral disease", 
+              "Landslide", "Wildfire","Ash fall", "Severe winter conditions",
+              "Extra-tropical storm", "Severe storm")
+
+new_types <- c()
+for (t in types) {
+  index <- which(nd_types == t)
+  if (length(which(nd_types == t)) == 0) {
+    print(t)
+  }
+  new_types <- c(new_types, poke_types[index])
+}
+```
+#####Making the final data frame called nd(Natural Disasters) 
+######Contains the columns:
+###### year
+###### type of natural disaster
+###### type of pokemon correspondence
+###### casualties
+###### ecoomic cost
+```{r, fig.width=3.2, fig.height = 2}
+nd <- data.frame("year" = rawnd[,1], 
+                 "type" = types,
+                 "poke_type" = new_types, 
+                 "casualty" = rawnd[,5]+rawnd[,6]+rawnd[,7], 
+                 "cost" = rawnd[,10])
+```
+######Writing the data frame into a file
+```{r, fig.width=3.2, fig.height = 2}
+file.create("../data/NaturalDisasters.csv")
+write.csv(nd,"../data/NaturalDisasters.csv")
+```
+
+
+
+
+####Economic Cost Data
+#####Process to Cleaning the Economics Data: 
+#####1) Reading in the File
+```{r, fig.width=3.2, fig.height = 2}
+Raw_GDP <- read.csv("../rawdata/GDP_Data.csv", stringsAsFactors = FALSE)
+```
+
+#####2) Clean Data:
+#####I wanted to remove the introductory piece, specifically, where this Data was obtained from (sorry), so that only the numbers remain. 
+```{r, fig.width=3.2, fig.height = 2}
+Quarter = Raw_GDP[-1:-10,1]
+GPD = as.numeric(Raw_GDP[-1:-10,2])
+Quarterly_GDP_Data <- data.frame(
+                          'Quarter' = Quarter, 
+                          'GDP' = GPD, stringsAsFactors = FALSE)
+```
+
+#####3) Create Yearly GDP 
+```{r, fig.width=3.2, fig.height = 2}
+Every_4th <- seq(0,nrow(Quarterly_GDP_Data),by = 4)
+Last_Row <- nrow(Quarterly_GDP_Data)
+Annual_GDP_Data <- data.frame(
+                      'Years' = 1995:2015,
+                      'GDP' = Quarterly_GDP_Data[c(Every_4th,Last_Row),2])
+```
+#####4) Export Data
+```{r, fig.width=3.2, fig.height = 2}
+file.create("../data/Econ.csv")
+write.csv(x = Annual_GDP_Data, file = "../data/Econ.csv", row.names = FALSE)
+
+```
+
+
+
+
+###Pokemon Data
+Goal: Return a clean data table, types.csv, containing pokemon types, the number of pokemon per type, a power metric for each type, and an average power metric per pokemon for each type
+
+Packages and Working Directory
+```{r, fig.width=3.2, fig.height = 2}
+library(dplyr)
+library(readr)
+```
+
+Getting the Tables we need
+```{r, fig.width=3.2, fig.height = 2}
+type_reference <- read_csv("../rawdata/types.csv")
+pokemon_stats <- read_csv("../rawdata/pokemon_stats.csv")
+pokemon_types <- read_csv("../rawdata/pokemon_types.csv")
+stat_names <- read_csv("../rawdata/stat_names.csv")
+```
+
+What Types we want
+```{r, fig.width=3.2, fig.height = 2}
+types <-  c('water', 'fire', 'flying', 'ground', 'poison',
+            'dragon', 'dark', 'ice', 'electric', 'rock' )
+```
+
+Function to get a type given a type ID. Use the data frame, type_reference
+```{r, fig.width=3.2, fig.height = 2}
+get_type_by_id <- function(id) {
+  return(type_reference[type_reference$id == id,]$identifier[1])
+}
+```
+Function returns the first element of array arr
+```{r, fig.width=3.2, fig.height = 2}
+get_first <- function(arr) {
+  return(arr[1])
+}
+```
+
+Group pokemon_types by first type, get actual types from type ID. Get the number of pokemon per type to get values for the count of each type in our types table. 
+```{r, fig.width=3.2, fig.height = 2}
+#Table of main pokemon types by pokemon ID
+pokemon_id_types <- group_by(pokemon_types, pokemon_id) %>% 
+  summarise(
+    type_id = get_first(type_id)
+    ) %>%
+  mutate(
+    type = sapply(type_id, get_type_by_id)
+    ) %>%
+  select(-type_id)
+
+#Number of pokemon by type
+type_counts <- group_by(pokemon_id_types, type) %>%
+  summarise(
+    pokemon_count = length(pokemon_id)
+    ) %>%
+  filter(type %in% types)
+```
+
+Link pokemon_id to types filtered to attack and special attack stats. Add these stats for a power metric. Group by type and add powers to get a total power metric per type
+```{r, fig.width=3.2, fig.height = 2}
+#Create table containing pokemon types and their corresponding attack and special
+# attack stats (combined in a column called power)
+stats_and_types <- left_join(pokemon_id_types, pokemon_stats) %>%
+  filter(stat_id %in% c(2,4)) %>%
+  group_by(pokemon_id) %>% 
+  summarise(
+    power = sum(base_stat), type = get_first(type)
+    )
+
+#Create table with type corresponding to the total sum of all pokemon with the type
+type_power <- group_by(stats_and_types, type) %>%
+  summarise(total_power = sum(power))
+
+#Join our power table with our count table by type. This is the final result
+result <- left_join(type_counts, type_power) %>%
+  mutate(
+    avg_power = as.integer(floor(total_power / pokemon_count))
+    )
+```
+
+Add a table of colors into pokemon table
+```{r, fig.width=3.2, fig.height = 2}
+result$color <- c('#000000', '#00e5ee', '#ffff00', '#ff0000', '#800000', 
+                  '#f4a460', '#ffffff', '#551a8b', '#d3d3d3', '#0000ff')
+```
+
+Store clean file as types_clean.csv
+```{r, fig.width=3.2, fig.height = 2}
+file.create("../data/types.csv")
+write.csv(x = result, file = "../data/types.csv", row.names = FALSE)
+```
+
+
+
+
+##Exploratory Data Analysis
+
+####After Cleaning the data, we must now inspect and explore the data.
+
+###GDP
+```{r, fig.width=3.2, fig.height = 2}
+#Basic Summary
+gdp <- read_csv("../data/Econ.csv")
+str(gdp)
+summary(gdp)
+```
+
+###Pokemon
+```{r, fig.width=3.2, fig.height = 2}
+#Basic Summary
+poke <- read_csv("../data/types.csv")
+str(poke)
+summary(poke)
+
+#Most common type
+most_common_pokemon <- with(poke, type[which.max(pokemon_count)])
+
+#Least common type
+least_common_pokemon <- with(poke, type[which.min(pokemon_count)])
+
+#Most destructive, considering number of pokemon per type
+most_destructive_pokemon <- with(poke, type[which.max(total_power)])
+
+#Least destructive, considering number of pokemon per type
+least_destructive_pokemon <- with(poke, type[which.min(total_power)])
+
+#Most destructive, not considering number of pokemon per type
+avg_most_destructive <- with(poke, type[which.max(avg_power)])
+
+#Least destructive, not considering number of pokemon per type
+avg_least_destructive <- with(poke, type[which.min(avg_power)])
+```
+
+###Natural Disasters
+```{r, fig.width=3.2, fig.height = 2}
+#Basic Summary
+nat_dis <- read_csv("../data/NaturalDisasters.csv")
+str(nat_dis)
+summary(nat_dis)
+```
+
+
+
+
+##Data Modelling
+###ECONOMIC ANALYSIS
+
+###Is there a trend between Natural Disaster and GDP? 
+First, I'll need to read in the Data sets
+
+```{r, fig.width=3.2, fig.height = 2}
+Econ <- read.csv('../data/Econ.csv')
+Natural_Disasters <- read.csv('../data/NaturalDisasters.csv')
+```
+
+Next, I'll need to manipulate the Data sets so I can merge the. The thing about Natural Disasters, is that I only need to know the total amount of damage done in a year--the type of disaster isn't necessary at the moment. 
+
+We'll use dplyr for this
+```{r, fig.width=3.2, fig.height = 2}
+#identify/create variables
+Year <- 1995:2015
+Damages <- c()
+
+for (i in 1995:2015) {
+  Dmg_per_year <- sum(filter(Natural_Disasters, year == i)[,'cost'])
+  Damages <- c(Damages,Dmg_per_year)
+}
+
+#create the data frame for total damage caused per year
+Natural_Disaster_Damages <- data.frame(
+  'Years' = Year,
+  'Damages' = Damages
+)
+Econ[,'GDP']<- Econ[,'GDP'] *1000000
+
+#merge data frames
+Econ_vs_ND_Damages <- merge(Econ,Natural_Disaster_Damages,by = "Years")
+```
+
+###Create the Graph 
+
+Note that GDP is measured in Billions, and the Damage is measured in dollar value.
+```{r, fig.width=3.2, fig.height = 2}
+library(ggplot2)
+
+#Trend of GDP per Year
+ggplot(Econ_vs_ND_Damages, aes(Years,GDP)) + 
+  geom_point(color = '#ff0000', size = 3) + 
+  ggtitle("GDP vs Years") +  
+  theme(legend.text = element_text(size = 2.5), text = element_text(size = 5.5)) +guides(fill = guide_legend(keywidth = .5, keyheight = .5))
+
+ggsave("../images/1GDPvsYears.png")
+ggsave("../images/1GDPvsYears.pdf")
+
+#Trend of Damages per Year
+ggplot(Econ_vs_ND_Damages, aes(Years,Damages)) + 
+  geom_point(color = '#ff0000', size = 3) + 
+  ggtitle("Damages vs Years") +
+  theme(legend.text = element_text(size = 2.5), text = element_text(size = 5.5)) +guides(fill = guide_legend(keywidth = .5, keyheight = .5))
+
+ggsave("../images/2DamagesvsYears.png")
+ggsave("../images/2DamagesvsYears.pdf")
+
+```
+
+There appears to be no correlation between GDP and Damages per year. Even though GDP is rising each year, Damages per Year does not seem to be affecting it.
+
+###Which Natural Disaster causes the most damage/influence in GDP
+Well, in the previous analysis, there is no clear distinction on the relationship between GDP and Natural Damages year by year. Regardless, it would still be interesting to see how the yearly data of natural disasters!
+```{r, fig.width=3.2, fig.height = 2}
+# x-axis = year
+# y- axis = total damage that year 
+# variable = type of natural disaster
+ggplot(Natural_Disasters,aes(year,cost)) + 
+  geom_bar(aes(fill = type),stat = 'identity') +
+  ggtitle("Most Damaging Natural Disaster per Year") +
+  theme(legend.text = element_text(size = 2.5), text = element_text(size = 5.5)) +guides(fill = guide_legend(keywidth = .5, keyheight = .5))
+  
+ggsave("../images/3Most_Damaging_Natural_Disaster_per_Year.png")
+ggsave("../images/3Most_Damaging_Natural_Disaster_per_Year.pdf")
+```
+
+Wow, now we can see obvious that for 2005, Forest Fire caused a lot of damage.In 2004, ash fall was the largest, and in 2012, Storm caused the next major source of damage. It should be noted that despite forest fires causing the most damage in 2005, the natural disaster type "storm" has the most "most damage in a year". Therefore, storm yearly may create more of an impact on GDP (if natural disasters actually affect GDP per year). 
+
+###Correlations between Pokemon, Natural Disasters and Economic Cost
+####Reading in the clean data and making the oranized data tables 
+```{r, fig.width=3.2, fig.height = 2}
+library(ggplot2)
+nd <- read_csv("../data/NaturalDisasters.csv")
+econ <- read_csv("../data/Econ.csv")
+poke <- read_csv("../data/types.csv")
+```
+
+###Question: Is there a correlation between types of Pokemon damage and its corresponding 
+####natural disasters?
+####We can see it by comparing the types vs their power and then the types 
+####vs their economic damage
+####First, organize the Pokemon types into subgroups and create vectors that
+####correspond to the damage and power
+```{r, fig.width=3.2, fig.height = 2}
+nd_types <- nd[,"poke_type"][[1]]
+nd_disasters <- nd[,"type"][[1]]
+poke_power <- c()
+for (t in nd_types) {
+  type_row <- subset(poke, type == t)
+  poke_power <- c(poke_power, as.numeric(type_row[,"total_power"]))
+}
+power_damage <- data.frame("natural" = nd_disasters, 
+                           "types" = nd[,"poke_type"], 
+                           "avg_power" = poke_power, 
+                           "economic_damage" = nd[,"cost"],
+                           "casualty" = nd[,"casualty"])
+
+poke_type <- unique(nd_types)
+
+ice <- subset(power_damage, poke_type == "ice")
+fire <- subset(power_damage, poke_type == "fire")
+flying <- subset(power_damage, poke_type == "flying")
+water <- subset(power_damage, poke_type == "water")
+electric <- subset(power_damage, poke_type == "electric")
+ground <- subset(power_damage, poke_type == "ground")
+poison <- subset(power_damage, poke_type == "poison")
+rock <- subset(power_damage, poke_type == "rock")
+dragon <- subset(power_damage, poke_type == "dragon")
+dark <- subset(power_damage, poke_type == "dark")
+
+damage <- c(sum(dark[,"cost"]), 
+            sum(dragon[,"cost"]), 
+            sum(electric[,"cost"]), 
+            sum(fire[,"cost"]), 
+            sum(flying[,"cost"]), 
+            sum(ground[,"cost"]), 
+            sum(ice[,"cost"]), 
+            sum(poison[,"cost"]), 
+            sum(rock[,"cost"]), 
+            sum(water[,"cost"]))
+casualties <- c(sum(dark[,"casualty"]), 
+                sum(dragon[,"casualty"]), 
+                sum(electric[,"casualty"]), 
+                sum(fire[,"casualty"]), 
+                sum(flying[,"casualty"]), 
+                sum(ground[,"casualty"]), 
+                sum(ice[,"casualty"]), 
+                sum(poison[,"casualty"]), 
+                sum(rock[,"casualty"]), 
+                sum(water[,"casualty"]))
+power <- poke[,"total_power"]
+
+test <- data.frame("type" = poke[,"type"], 
+                   "damage" = damage, 
+                   "power" = power, 
+                   "casualty" = casualties)
+```
+####Pokemon type vs. Pokemon power
+####This graph sees the relationship  between type of Pokemon and their economic damage 
+####which is the corresponding economic cost that the corresponding natural disasters
+####caused.
+```{r, fig.width=3.2, fig.height = 2}
+ggplot(test, aes(x = poke[,"type"][[1]])) + 
+  geom_bar(aes(y = test[,"total_power"], 
+               fill = poke[,"type"][[1]]), 
+           stat = "identity") +
+  ggtitle("Pokemon type and their power") + 
+  xlab("Type") +
+  ylab("Power") + 
+  scale_fill_manual(name = "types",
+                    values = 
+                      c('#000000', '#00e5ee', 
+                        '#ffff00', '#ff0000', '#800000', 
+                  '#f4a460', '#ffffff', 
+                  '#551a8b', '#d3d3d3', '#0000ff')) +
+  theme(legend.text = element_text(size = 2.5), axis.text.x=element_text(angle=90,
+                                 hjust=1,
+                                 vjust=0.5)) +  
+  theme(legend.text = element_text(size = 2.5), text = element_text(size = 5.5)) +guides(fill = guide_legend(keywidth = .5, keyheight = .5))
+
+ggsave("../images/4PokemonType_Power.png")
+ggsave("../images/4PokemonType_Power.pdf")
+```
+####Pokemon type vs. economic damage
+####This graph sees the relationship  between type of Pokemon and their power 
+####which is the attack and special attack of each pokemon.
+```{r, fig.width=3.2, fig.height = 2}
+ggplot(test, aes(x = poke[,"type"][[1]])) + 
+  geom_bar(aes(y = test[,"damage"], 
+               fill = poke[,"type"][[1]]), 
+           stat = "identity") + 
+  ggtitle("Pokemon type and their economic damage") + 
+  xlab("Type") + 
+  ylab("Damage") + 
+  scale_fill_manual(name = "types", 
+                    values = 
+                      c('#000000', '#00e5ee', '#ffff00', '#ff0000', '#800000', 
+                  '#f4a460', '#ffffff', '#551a8b', '#d3d3d3', '#0000ff')) +
+  theme(legend.text = element_text(size = 2.5), axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+  
+  theme(legend.text = element_text(size = 2.5), text = element_text(size = 5.5)) +guides(fill = guide_legend(keywidth = .5, keyheight = .5))
+
+ggsave("../images/5PokemonType_EconDamage.png")
+ggsave("../images/5PokemonType_EconDamage.pdf")
+```
+
+####What is the most occurring natural disaster?
+```{r, fig.width=3.2, fig.height = 2}
+sort(table(nd[,"type"]), decreasing = TRUE)[1]
+```
+####Convective storms are the most occurring natural disaster, however their economic
+####damage and power are not very high. It's corresponding Pokemon type is "flying" 
+####and it is the type with the least power.
+#### Conclusion: There is no relationship between Pokemon types' damage and their
+#### power.
+####Pokemon type vs. casualties
+####This graph sees the relationship  between type of Pokemon and their casualty damage
+```{r, fig.width=3.2, fig.height = 2}
+ggplot(test, aes(x = poke[,"type"][[1]])) + geom_bar(aes(y = test[,"casualty"],
+fill = poke[,"type"][[1]]), stat = "identity") + ggtitle("Pokemon type and
+their casualty damage") + xlab("Type") + ylab("Casualties") +  scale_fill_manual(name = "types", 
+                    values = 
+                      c('#000000', '#00e5ee', '#ffff00', '#ff0000', '#800000', 
+                  '#f4a460', '#ffffff', '#551a8b', '#d3d3d3', '#0000ff')) +
+  theme(legend.text = element_text(size = 2.5), axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+  
+  theme(legend.text = element_text(size = 2.5), text = element_text(size = 5.5)) +guides(fill = guide_legend(keywidth = .5, keyheight = .5))
+
+ggsave("../images/6PokemonType_Casualties.png")
+ggsave("../images/6PokemonType_Casualties.pdf")
+
+```
+####The total variation distance is not going to be 0. 
+
+####What is the most occurring natural disaster?
+```{r, fig.width=3.2, fig.height = 2}
+sort(table(nd[,"type"]), decreasing = TRUE)[1]
+```
+####Convective storms are the most occurring natural disaster, however their economic
+####damage and power are not very high. It's corresponding Pokemon type is "flying" 
+####and it is the type with the least power.
+#### Conclusion: There is no relationship between Pokemon types' damage and their
+#### power.
+
+### POKEMON ANALYSIS
+####importing the tables from Clean Data
+```{r, fig.width=3.2, fig.height = 2}
+pokemon_types <- read_csv("../data/types.csv")
+natural_disasters <- read_csv("../data/NaturalDisasters.csv")
+economic_data <- read_csv("../data/Econ.csv")
+```
+####Number of pokemon per type
+```{r, fig.width=3.2, fig.height = 2}
+ggplot(data = pokemon_types, 
+       aes(type, pokemon_count, fill = type)) + 
+  geom_bar(stat = "identity") + 
+  scale_fill_manual(values = pokemon_types$color) +
+  ggtitle("Number of Pokemon per Type") +
+  xlab("Type") +
+  ylab("Pokemon Count")+
+  theme(legend.text = element_text(size = 2.5), axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+  
+  theme(legend.text = element_text(size = 2.5), text = element_text(size = 5.5)) +guides(fill = guide_legend(keywidth = .5, keyheight = .5)) 
+
+ggsave("../images/7Pokemon_per_Type.png")
+ggsave("../images/7Pokemon_per_Type.pdf")
+```
+
+From here, we can see that there is an overwhelming amount of water pokemon in the world and not that many flying types. All the other types have pretty much the same amount of pokemon.
+
+#Total Destructive Power of pokemon per type
+```{r, fig.width=3.2, fig.height = 2}
+ggplot(data = pokemon_types, 
+       aes(type, total_power, fill = type)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = pokemon_types$color) +
+  ggtitle("Total Destructive Power per Type") +
+  xlab("Type") +
+  ylab("Power") +
+  theme(legend.text = element_text(size = 2.5), axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+  
+  theme(legend.text = element_text(size = 2.5), text = element_text(size = 5.5)) +guides(fill = guide_legend(keywidth = .5, keyheight = .5))
+
+ggsave("../images/8Pokemon_Power_per_Type.png")
+ggsave("../images/8Pokemon_Power_per_Type.pdf")
+```
+
+This looks relatively the same as the last plot. It seems that no matter what type, it is strength in numbers that prevail for the total amount of data 
+
+#Average Destructive Power of Pokemon per Type
+```{r, fig.width=3.2, fig.height = 2}
+ggplot(data = pokemon_types, aes(type, avg_power, fill = type)) + 
+  geom_bar(stat = "identity") + 
+  scale_fill_manual(values = pokemon_types$color) +
+  ggtitle("Average Power per Type") +
+  xlab("Type") +
+  ylab("Power") +
+  theme(legend.text = element_text(size = 2.5), axis.text.x=element_text(angle=90,hjust=1,vjust=0.5),text = element_text(size = 5.5))
+
+ggsave("../images/9Avg_Pokemon_Power_per_Type.png")
+ggsave("../images/9Avg_Pokemon_Power_per_Type.pdf")
+```
+
+Now we see a different trend. It seems that now dragon types have the most average power per pokemon. Most of the other types have a power metric around 150 units.
+
+###Modelling of Natural Disasters Data Set
+Let's first plot the occurrences of natural disasters per year
+```{r, fig.width=3.2, fig.height = 2}
+occurrences <- group_by(natural_disasters, year) %>%
+  summarise(count = length(casualty))
+
+ggplot(data = occurrences, aes(year, count)) + 
+  geom_line(color = '#FF3456', size = 2) + 
+  geom_point(color = '#FF3456', size = 5) +
+  ggtitle("Number of Natural Disasters per Year from 1995-2015") +
+  labs(x = "Year", y = "Occurences", xlim = seq(1995,2016)) + theme(legend.text = element_text(size = 0.5), text = element_text(size = 5.5), legend.background = element_rect(size = 2)) 
+
+ggsave("../images/10Disasters_per_Type.png")
+ggsave("../images/10Disasters_per_Type.pdf")
+```
+From this we see a steady rise and fall in natural disasters in the US over the years.
+
+So what is the year with the most disasters?
+```{r, fig.width=3.2, fig.height = 2}
+most_disastrous_year <- with(occurrences, year[which.max(count)])
+```
+
+Let's now plot the number of casualties from natural disasters per year
+```{r, fig.width=3.2, fig.height = 2}
+ggplot(data = natural_disasters, 
+       aes(year, casualty)) + 
+  geom_bar(stat = "identity") +  
+  theme(legend.text = element_text(size = 2.5), text = element_text(size = 5.5)) +guides(fill = guide_legend(keywidth = .5, keyheight = .5))
+
+ggsave("../images/11Disasters_Type_and_Casualties_per_Type.png")
+ggsave("../images/11Disasters_Type_and_Casualties_per_Type.pdf")
+```
+Wow, it looks like 2008 had an abnormally large amount of casualties from natural disasters over the years.
+
+But which year had the most casualties and how many?
+```{r, fig.width=3.2, fig.height = 2}
+total_casualties <- group_by(natural_disasters, year) %>%
+  summarise(casualty = sum(casualty))
+year_most_casualties <- with(total_casualties, year[which.max(casualty)])
+year_most_casualties_count <- with(total_casualties, casualty[which.max(casualty)])
+```
+
+Let's now plot the economic cost of natural disasters over the years.
+```{r, fig.width=3.2, fig.height = 2}
+total_cost <- group_by(natural_disasters, year) %>%
+  summarise(cost = sum(cost))
+ggplot(data = total_cost, aes(year, cost)) +
+  geom_line(color = '#FF3456', size = 2) + 
+  geom_point(color = '#FF3456', size = 5) +
+  ggtitle("Cost of Natural Disasters by Year") +
+  labs(x = "Year", y = "Cost") +  
+  theme(legend.text = element_text(size = 2.5), text = element_text(size = 5.5)) +guides(fill = guide_legend(keywidth = .5, keyheight = .5))
+
+ggsave("../images/12Economic_Cost_vs_Disasters.png")
+ggsave("../images/12Economic_Cost_vs_Disasters.pdf")
+```
+It looks like 2005 has one of the greatest economic cost from disasters. Looking at the previous graph of "Most Damaging Natural Disaster per Year", we remember that the cost is from forest fire. It is also interesting to note how although the number of casualties in 2008 was abnormally high, the economic cost was not as great. The most expensive year is:
+```{r, fig.width=3.2, fig.height = 2}
+most_expensive_year <- with(total_cost, year[which.max(cost)])
+```
+
+Let's see the most casualties affected by each disaster
+```{r}
+disaster_casualties <- group_by(natural_disasters, type) %>% summarise(casualty = sum(casualty))
+barplot(disaster_casualties$casualty,  main = "Number of Casualties per Disaster",
+        names.arg = disaster_casualties$type, 
+        horiz = TRUE, col = "#A311F1", las = 1,
+        ylab = 'Disaster', xlab = 'Number Casualties',
+        cex.axis=.6, cex.names=.6)
+
+dev.copy(png,"../images/13Casualties_per_Disaster.png")
+dev.off()
+
+dev.copy(pdf,"../images/13Casualties_per_Disaster.pdf")
+dev.off()
+```
+From this, it can be seen a bulk of the disasters stem from fires and the disaster with most casualties is:
+```{r, fig.width=3.2, fig.height = 2}
+disaster_most_casualties <- with(disaster_casualties, type[which.max(casualty)])
+```
+
+
+Now, let's assess economic cost per disaster.
+```{r}
+disaster_cost <- group_by(natural_disasters, type) %>% summarise(cost = sum(cost))
+barplot(disaster_cost$cost,  main = "Total Cost per Disaster",
+        names.arg = disaster_cost$type, 
+        horiz = TRUE, col = "#A311F1", las = 1,
+        ylab = 'Disaster', xlab = 'Cost',
+        cex.axis=.6, cex.names=.6)
+
+dev.copy(png,"../images/14Cost_per_Disaster.png")
+dev.off()
+dev.copy(pdf,"../images/14Cost_per_Disaster.pdf")
+dev.off()
+```
+It seems that forest fires had an abnormally large amount of costs compared with the other types of disasters, and the most expensive disaster is:
+```{r, fig.width=3.2, fig.height = 2}
+most_expensive_disaster <- with(disaster_cost, type[which.max(cost)])
+```
+
+What about the occurences of each disaster over this period?
+```{r}
+disaster_occurrences <- group_by(natural_disasters, type) %>% summarise(count = length(casualty))
+barplot(disaster_occurrences$count,  main = "Occurrences per Disaster",
+        names.arg = disaster_occurrences$type, 
+        horiz = TRUE, col = "#A311F1", las = 1,
+        ylab = 'Disaster', xlab = 'Occurrences',
+        cex.axis=.6, cex.names=.6)
+
+dev.copy(png,"../images/15Disaster_Occurences.png")
+dev.off()
+
+dev.copy(pdf,"../images/15Disaster_Occurences.pdf")
+dev.off()
+```
+And the the most occurrent disaster is:
+```{r, fig.width=3.2, fig.height = 2}
+most_occurring <- with(disaster_occurrences, type[which.max(count)])
+```
+
