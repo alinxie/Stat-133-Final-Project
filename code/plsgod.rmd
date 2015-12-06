@@ -548,7 +548,7 @@ ggplot(data = pokemon_types, aes(type, avg_power, fill = type)) +
   ggtitle("Average Power per Type") +
   xlab("Type") +
   ylab("Power") +
-  theme(legend.text = element_text(size = 2.5), axis.text.x=element_text(angle=90,hjust=1,vjust=0.5),text = element_text(size = 5.5))
+  theme(legend.text = element_text(size = 2.5), axis.text.x=element_text(angle=90,hjust=1,vjust=0.5),text = element_text(size = 5.5))+guides(fill = guide_legend(keywidth = .5, keyheight = .5))
 
 ggsave("../images/9Avg_Pokemon_Power_per_Type.png")
 ggsave("../images/9Avg_Pokemon_Power_per_Type.pdf")
