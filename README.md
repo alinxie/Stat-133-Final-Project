@@ -41,7 +41,8 @@ ORGANIZATION
     ~ “emdat.be”
     ~ “research.stlouisfed.org/fred2/”
   * cleaned data saved in "data" subdirectory
-  * Scripts and Report saved in "code" subdirectory
+  * Scripts "code" subdirectory
+  * Rmd reporting files in "report" subdirectory
   * Graphical modelling images saved in "images" subdirectory
 
 LIBRARIES
