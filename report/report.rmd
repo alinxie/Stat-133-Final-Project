@@ -1,0 +1,71 @@
+---
+title: "FINALPRESENTATION"
+author: "Alice Wang"
+date: "December 6, 2015"
+output: pdf_document
+---
+```{r}
+library(png)
+require(knitr)
+opts_knit$set(root.dir = "/users/alicewang/desktop/stat133/finalproject/images")
+```
+#GDP vs Years
+```{r}
+grid::grid.raster(readPNG("1GDPvsYears.png" ))
+```
+#Damages vs Years
+```{r}
+grid::grid.raster(readPNG("2DamagesvsYears.png" ))
+```
+#Most Damaging Natural Disaster per year
+```{r}
+grid::grid.raster(readPNG("3Most_Damaging_Natural_Disaster_per_Year.png" ))
+```
+#Pokemon Type vs Power
+```{r}
+grid::grid.raster(readPNG("../images/4PokemonType_Power.png" ))
+```
+#Pokemon Type vs Economic Damage
+```{r}
+grid::grid.raster(readPNG("../images/5PokemonType_EconDamage.png" ))
+```
+#Pokemon Type vs Casualties
+```{r}
+grid::grid.raster(readPNG("../images/6PokemonType_Casualties.png" ))
+```
+#Pokemon per Type
+```{r}
+grid::grid.raster(readPNG("../images/7Pokemon_per_Type.png" ))
+```
+#Pokemon Power per Type
+```{r}
+grid::grid.raster(readPNG("../images/8Pokemon_Power_per_Type.png" ))
+```
+#Average Pokemon Power per Type
+```{r}
+grid::grid.raster(readPNG("../images/9Avg_Pokemon_Power_per_Type.png" ))
+```
+#Disasters per Type
+```{r}
+grid::grid.raster(readPNG("../images/10Disasters_per_Type.png" ))
+```
+#Disasters Type per Casualty per Year
+```{r}
+grid::grid.raster(readPNG("../images/11Disasters_Type_and_Casualties_per_Type.png" ))
+```
+#Economic Cost vs Natural Disaster
+```{r}
+grid::grid.raster(readPNG("../images/12Economic_Cost_vs_Disasters.png" ))
+```
+#Casualty per Disaster
+```{r}
+grid::grid.raster(readPNG("../images/13Casualties_per_Disaster.png" ))
+```
+#Economic Cost per Disaster
+```{r}
+grid::grid.raster(readPNG("../images/14Cost_per_Disaster.png" ))
+```
+#Disaster Occurrences
+```{r}
+grid::grid.raster(readPNG("../images/15Disaster_Occurences.png" ))
+```
