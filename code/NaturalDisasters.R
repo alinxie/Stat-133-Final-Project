@@ -1,7 +1,10 @@
 library(dplyr)
 library(readr)
 setwd("/users/alicewang/desktop/stat133/finalproject/")
+#Cleaning the Data:
+#Reading in the raw data
 rawnd <- read.csv("./rawdata/naturaldisasters.csv")
+#Creating the column type and specifying them precisely
 types <- c()
 type <- as.character(rawnd[,2])
 subtype <- as.character(rawnd[,3])
@@ -18,6 +21,7 @@ for (i in 1:155) {
   }
 }
 
+#Creating the corresponding pokemon types as another column in data frame
 poke_types <- c("ice","fire", "flying", "water", "water", "electric", 
                 "flying","ice", "fire", "fire","electric", "flying", "water", 
                 "fire", "ice", "ground", "ice", "poison", "rock", 
@@ -40,7 +44,20 @@ for (t in types) {
   new_types <- c(new_types, poke_types[index])
 }
 
-nd <- data.frame("year" = rawnd[,1], "type" = types,"poke_type" = new_types, "casualty" = rawnd[,5]+rawnd[,6]+rawnd[,7], "cost" = rawnd[,10])
+#Making the final data frame called nd(Natural Disasters) 
+#Contains the columns:
+# year
+# type of natural disaster
+# type of pokemon correspondence
+# casualties
+# ecoomic cost
 
+nd <- data.frame("year" = rawnd[,1], 
+                 "type" = types,
+                 "poke_type" = new_types, 
+                 "casualty" = rawnd[,5]+rawnd[,6]+rawnd[,7], 
+                 "cost" = rawnd[,10])
+
+#Writing the data frame into a file
 file.create("./data/NaturalDisasters.csv")
 write.csv(nd,"./data/NaturalDisasters.csv")
