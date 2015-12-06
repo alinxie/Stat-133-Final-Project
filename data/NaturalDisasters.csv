@@ -1,0 +1,156 @@
+"","year","type","poke_type","casualty","cost"
+"1",1995,"Cold wave","ice",710,0
+"2",1995,"Heat wave","fire",115319,3245000
+"3",1995,"Storm","flying",84242,10645000
+"4",1995,"Riverine flood","water",68,3000000
+"5",1996,"Flood","water",243187,2720000
+"6",1996,"Convective storm","electric",4039,3400000
+"7",1996,"Tropical cyclone","flying",36,0
+"8",1996,"Riverine flood","water",132,0
+"9",1996,"Winter storm/Blizzard","ice",211,0
+"10",1996,"Convective storm","electric",51,8500
+"11",1997,"Tropical cyclone","flying",191046,7345000
+"12",1997,"Forest fire","fire",616,150000
+"13",1997,"Land fire (Brush, Bush, Pastur","fire",628,180000
+"14",1997,"Lightning","electric",21,150000
+"15",1997,"Riverine flood","water",0,0
+"16",1997,"Tornado","flying",3743,1260000
+"17",1997,"Convective storm","electric",64,502000
+"18",1997,"Tropical cyclone","flying",1000,2500
+"19",1998,"Forest fire","fire",130,4275000
+"20",1998,"Heat wave","fire",32031,1062000
+"21",1998,"Storm","flying",143646,6527450
+"22",1998,"Flash flood","water",5409,3263500
+"23",1998,"Riverine flood","water",2200,0
+"24",1998,"Tornado","flying",983,262500
+"25",1998,"Convective storm","electric",7,0
+"26",1998,"Tropical cyclone","flying",41158,281100
+"27",1999,"Land fire (Brush, Bush, Pastur","fire",0,1100000
+"28",1999,"Drought","fire",257,1000000
+"29",1999,"Heat wave","fire",100,300
+"30",1999,"Storm","flying",3045095,7432500
+"31",1999,"Hail","ice",1251,450000
+"32",1999,"Convective storm","electric",950,300500
+"33",1999,"Tropical cyclone","flying",4763,3417500
+"34",1999,"Forest fire","fire",48,1000000
+"35",1999,"Land fire (Brush, Bush, Pastur","fire",801,92000
+"36",2000,"Drought","fire",0,1100000
+"37",2000,"Ground movement","ground",25070,50000
+"38",2000,"Heat wave","fire",35,0
+"39",2000,"Flood","water",1654,286000
+"40",2000,"Flash flood","water",14511,1069000
+"41",2000,"Riverine flood","water",0,0
+"42",2000,"Tornado","flying",5072,786600
+"43",2000,"Convective storm","electric",0,0
+"44",2000,"Forest fire","fire",35416,2500000
+"45",2001,"Ground movement","ground",401,2000000
+"46",2001,"Heat wave","fire",56,0
+"47",2001,"Flood","water",19312,33000
+"48",2001,"Riverine flood","water",102276,6000000
+"49",2001,"Tornado","flying",7350,328800
+"50",2001,"Convective storm","electric",111,0
+"51",2001,"Tropical cyclone","flying",141,0
+"52",2002,"Forest fire","fire",0,3300000
+"53",2002,"Drought","fire",3838,0
+"54",2002,"Extreme temperature ","ice",14,0
+"55",2002,"Viral disease","poison",145776,1013000
+"56",2002,"Heat wave","fire",14050,2900500
+"57",2002,"Riverine flood","water",4749,2924000
+"58",2002,"Winter storm/Blizzard","ice",92,450500
+"59",2002,"Convective storm","electric",3511,232100
+"60",2003,"Tropical cyclone","flying",42,200000
+"61",2003,"Forest fire","fire",29,0
+"62",2003,"Land fire (Brush, Bush, Pastur","fire",3224,123000
+"63",2003,"Ground movement","ground",30,0
+"64",2003,"Viral disease","poison",226292,5920000
+"65",2003,"Flash flood","water",2046,9000000
+"66",2003,"Riverine flood","water",180,233600
+"67",2003,"Landslide","rock",0,0
+"68",2003,"Wildfire","fire",27162,3500000
+"69",2004,"Convective storm","electric",3,0
+"70",2004,"Tropical cyclone","flying",5341,505500
+"71",2004,"Ash fall","fire",5070178,53062500
+"72",2004,"Forest fire","fire",364,1100000
+"73",2004,"Cold wave","ice",7235,715000
+"74",2004,"Riverine flood","water",1679,309000
+"75",2004,"Wildfire","fire",15205,0
+"76",2005,"Convective storm","electric",64,0
+"77",2005,"Tropical cyclone","flying",18311,730330
+"78",2005,"Forest fire","fire",831852,157530000
+"79",2005,"Heat wave","fire",53,350000
+"80",2005,"Flash flood","water",120,0
+"81",2005,"Riverine flood","water",30,350000
+"82",2005,"Convective storm","electric",5,100000
+"83",2006,"Tropical cyclone","flying",3529,150000
+"84",2006,"Forest fire","fire",188,0
+"85",2006,"Ground movement","ground",74100,1478500
+"86",2006,"Heat wave","fire",167,32860
+"87",2006,"Riverine flood","water",4301,2200000
+"88",2006,"Lightning","electric",601,450000
+"89",2006,"Convective storm","electric",684,1385000
+"90",2006,"Tropical cyclone","flying",3,660000
+"91",2006,"Wildfire","fire",23,66000
+"92",2007,"Land fire (Brush, Bush, Pastur","fire",0,300000
+"93",2007,"Drought","fire",8890,728000
+"94",2007,"Flash flood","water",1544,4600000
+"95",2007,"Riverine flood","water",6802,1080000
+"96",2007,"Winter storm/Blizzard","ice",16,140000
+"97",2007,"Convective storm","electric",650072,2815000
+"98",2008,"Tropical cyclone","flying",2103,0
+"99",2008,"Forest fire","fire",0,0
+"100",2008,"Land fire (Brush, Bush, Pastur","fire",11032692,10002000
+"101",2008,"Ground movement","ground",2300556,39540000
+"102",2008,"Severe winter conditions","ice",844,5860000
+"103",2008,"Riverine flood","water",5,360000
+"104",2008,"Convective storm","electric",55021,2000000
+"105",2009,"Extra-tropical storm","dragon",58,1100000
+"106",2009,"Tropical cyclone","flying",9071,666000
+"107",2009,"Storm","flying",18,600000
+"108",2009,"Forest fire","fire",31,1500000
+"109",2009,"Cold wave","ice",7,1240000
+"110",2009,"Riverine flood","water",907,7050000
+"111",2009,"Convective storm","electric",19,0
+"112",2009,"Tropical cyclone","flying",31,100000
+"113",2010,"Land fire (Brush, Bush, Pastur","fire",630,12500
+"114",2010,"Ground movement","ground",1020,0
+"115",2010,"Riverine flood","water",20,1600000
+"116",2010,"Convective storm","electric",120,0
+"117",2010,"Tropical cyclone","flying",8050,2350000
+"118",2010,"Drought","fire",2866,2700000
+"119",2010,"Heat wave","fire",3,2500000
+"120",2011,"Riverine flood","water",0,8000000
+"121",2011,"Convective storm","electric",22,0
+"122",2011,"Tropical cyclone","flying",25117,6600000
+"123",2011,"Forest fire","fire",370677,11550000
+"124",2011,"Land fire (Brush, Bush, Pastur","fire",4183,27000000
+"125",2011,"Drought","fire",95,4900000
+"126",2011,"Heat wave","fire",13,1383000
+"127",2012,"Riverine flood","water",0,20000000
+"128",2012,"Convective storm","electric",123,0
+"129",2012,"Tropical cyclone","flying",302,174000
+"130",2012,"Storm","flying",77065,52210000
+"131",2012,"Severe winter conditions","ice",9012,7610000
+"132",2012,"Riverine flood","water",129,8500000
+"133",2012,"Convective storm","electric",3693,9025000
+"134",2012,"Winter storm/Blizzard","ice",28,150000
+"135",2012,"Forest fire","fire",1812,800000
+"136",2013,"Drought","fire",19,0
+"137",2013,"Ground movement","ground",29356,2275000
+"138",2013,"Cold wave","ice",4,1200000
+"139",2013,"Flash flood","water",9,4900000
+"140",2013,"Riverine flood","water",172068,7100000
+"141",2013,"Landslide","rock",4933,1400000
+"142",2013,"Convective storm","electric",150,706400
+"143",2014,"Tropical cyclone","flying",0,2200000
+"144",2014,"Forest fire","fire",3251,700000
+"145",2014,"Flash flood","water",21,2500000
+"146",2014,"Convective storm","electric",102002,1690000
+"147",2014,"Landslide","rock",43,20000
+"148",2014,"Storm","flying",835,66000
+"149",2014,"Lightning","electric",340,5940000
+"150",2014,"Severe storm","dark",55,2000000
+"151",2014,"Winter storm/Blizzard","ice",91,1560000
+"152",2014,"Wildfire","fire",431,100000
+"153",2015,"Flood","water",24048,1000000
+"154",2015,"Tornado","flying",82,2750000
+"155",2015,"Winter storm/Blizzard","ice",82,775000
