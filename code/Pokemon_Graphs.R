@@ -2,64 +2,118 @@ library(ggplot2)
 library(dplyr)
 library(readr)
 
-#First, import the tables from Clean Data
+#importing the tables from Clean Data
 pokemon_types <- read_csv("../data/types.csv")
 natural_disasters <- read_csv("../data/NaturalDisasters.csv")
 economic_data <- read_csv("../data/Econ.csv")
 
-#INSERT TITLE AND DESCRIPTION
-#Number of pokemon per type
-ggplot(data = pokemon_types, aes(type, pokemon_count, 
-                                 fill = type)) + geom_bar(stat = "identity") 
-+ scale_fill_manual(values = pokemon_types$color)
-# From here, we can see that there is an overwhelming amount of water pokemon in
-# the world and not that many flying types. All the other types have pretty much
-# the same amount of pokemon.
+### POKEMON ANALYSIS ###
 
-#INSERT TITLE AND DESCRIPTION
+#Number of pokemon per type
+ggplot(data = pokemon_types, aes(type, 
+                                 pokemon_count, fill = type)) + 
+  geom_bar(stat = "identity") + 
+  scale_fill_manual(values = pokemon_types$color) +
+  ggtitle("Number of Pokemon per Type") +
+  xlab("Type") +
+  ylab("Pokemon Count")
+
+#Type with greatest # of pokemon
+most_pokemon <- with(pokemon_types, type[which.max(pokemon_count)])
+
+#Type with least # of pokemon
+least_pokemon <- with(pokemon_types, type[which.min(pokemon_count)])
+
 #Total Destructive Power of pokemon per type
 ggplot(data = pokemon_types, aes(type, total_power, fill = type)) +
-geom_bar(stat = "identity") + scale_fill_manual(values = pokemon_types$color)
-# This looks relatively the same as the last plot. It seems that no matter what
-# type, it is strength in numbers that prevail for the total amount of data
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = pokemon_types$color) +
+  ggtitle("Total Destructive Power per Type") +
+  xlab("Type") +
+  ylab("Power")
 
-#INSERT TITLE AND DESCRIPTION
+#Most destructive pokemon type considering number of pokemon of each type
+most_destructive <- with(pokemon_types, type[which.max(total_power)])
+
+#Least destructive pokemon type considering number of pokemon of each type
+least_destructive <- with(pokemon_types, type[which.min(total_power)])
+
 #Average Destructive Power of Pokemon per Type
-ggplot(data = pokemon_types, aes(type, avg_power, fill = type)) +
-geom_bar(stat = "identity") + scale_fill_manual(values = pokemon_types$color)
-# Now we see a different trend. It seems that now dragon types have the most
-# average power per pokemon. Most of the other types have a power metric around
-# 150 units.
+ggplot(data = pokemon_types, aes(type, avg_power, fill = type)) + 
+  geom_bar(stat = "identity") + 
+  scale_fill_manual(values = pokemon_types$color) +
+  ggtitle("Average Power per Type") +
+  xlab("Type") +
+  ylab("Power")
 
-#INSERT TITLE AND DESCRIPTION
-#Exploratory analysis of Natural Disasters Data Set
-#Let's first plot the occurrences of natural disasters per year
-occurrences <- group_by(natural_disasters, year) %>% summarise(count = length(casualty))
-ggplot(data = occurrences, aes(year, count)) + geom_line() + geom_point() +
-labs(x = "year", y = "occurences", xlim = seq(1995,2016))
-# From this we see a steady rise and fall in natural disasters in the US over the years.
+#Most destructive pokemon type not considering number of pokemon of each type
+avg_most_destructive <- with(pokemon_types, type[which.max(avg_power)])
 
-#INSERT TITLE AND DESCRIPTION
+#Least destructive pokemon type not considering number of pokemon of each type
+avg_least_destructive <- with(pokemon_types, type[which.min(avg_power)])
+
+
+### NATURAL DISASTERS ###
+
+#occurrences of natural disasters per year
+occurrences <- group_by(natural_disasters, year) %>%
+  summarise(count = length(casualty))
+ggplot(data = occurrences, aes(year, count)) + 
+  geom_line(color = '#FF3456', size = 2) + 
+  geom_point(color = '#FF3456', size = 5) +
+  ggtitle("Number of Natural Disasters per Year from 1995-2015") +
+  labs(x = "Year", y = "Occurences", xlim = seq(1995,2016))
+
+#Year with the most natural disasters
+most_disastrous_year <- with(occurrences, year[which.max(count)])
+
 # Let's now plot the number of casualties from natural disasters per year
 ggplot(data = natural_disasters, aes(year, casualty)) + geom_bar(stat = "identity") 
-# Wow, it looks like 2008 had an abnormally large amount of casualties from
-# natural disasters over the years. 
 
-#INSERT TITLE AND DESCRIPTION
-#Let's now plot the economic cost of natural disasters over the years.
-ggplot(data = natural_disasters, aes(year, cost)) + geom_bar(stat = "identity")
-# It looks like 2005 has one of the greatest economic cost from disasters. This
-# is possibly from the occurrences of hurrican katrina. It is also interesting
-# to note how although the number of casualties in 2008 was abnormally high, the
-# economic cost was not as great. Let's see the most casualties affected by each
-# disaster
+#Year with most casualties and how many
+total_casualties <- group_by(natural_disasters, year) %>%
+  summarise(casualty = sum(casualty))
+year_most_casualties <- with(total_casualties, year[which.max(casualty)])
+year_most_casualties_count <- with(total_casualties, casualty[which.max(casualty)])
 
-#INSERT TITLE AND DESCRIPTION
-ggplot(data = natural_disasters, aes(type, casualty)) + geom_bar(stat = "identity")
-# From this, it can be seen a bulk of the disasters stem from fires.
-# Now, let's assess economic cost per disaster.
+#Economic cost of natural disasters over the years.
+total_cost <- group_by(natural_disasters, year) %>%
+  summarise(cost = sum(cost))
+ggplot(data = total_cost, aes(year, cost)) +
+  geom_line(color = '#FF3456', size = 2) + 
+  geom_point(color = '#FF3456', size = 5) +
+  ggtitle("Cost of Natural Disasters by Year") +
+  labs(x = "Year", y = "Cost")
 
-#INSERT TITLE AND DESCRIPTION
-ggplot(data = natural_disasters, aes(type, cost)) + geom_bar(stat = "identity")
-# It seems that forest fires had an abnormally large amount of costs compared
-# with the other types of disasters
+#Most expensive year
+most_expensive_year <- with(total_cost, year[which.max(cost)])
+
+#Most casualties by disaster
+disaster_casualties <- group_by(natural_disasters, type) %>% summarise(casualty = sum(casualty))
+barplot(disaster_casualties$casualty,  main = "Number of Casualties per Disaster",
+        names.arg = disaster_casualties$type, 
+        horiz = TRUE, col = "#A311F1", las = 1,
+        ylab = 'Disaster', xlab = 'Number Casualties')
+
+#Disaster with most casualties
+disaster_most_casualties <- with(disaster_casualties, type[which.max(casualty)])
+
+#Economic cost by disaster
+disaster_cost <- group_by(natural_disasters, type) %>% summarise(cost = sum(cost))
+barplot(disaster_cost$cost,  main = "Total Cost per Disaster",
+        names.arg = disaster_cost$type, 
+        horiz = TRUE, col = "#A311F1", las = 1,
+        ylab = 'Disaster', xlab = 'Cost')
+
+#Most expensive Disaster
+most_expensive_disaster <- with(disaster_cost, type[which.max(cost)])
+
+#Occurences of each disaster
+disaster_occurrences <- group_by(natural_disasters, type) %>% summarise(count = length(casualty))
+barplot(disaster_occurrences$count,  main = "Occurrences per Disaster",
+        names.arg = disaster_occurrences$type, 
+        horiz = TRUE, col = "#A311F1", las = 1,
+        ylab = 'Disaster', xlab = 'Occurrences')
+
+#Most occurrent Disaster
+most_occurring <- with(disaster_occurrences, type[which.max(count)])
