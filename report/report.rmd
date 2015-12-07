@@ -1,0 +1,151 @@
+---
+title: "Pokemon, Natural Disasters and Economic Impacts"
+author: "Alice Wang, Andrew Linxie, Jerry Haoming Jiang"
+date: "December 6, 2015"
+output: pdf_document
+---
+##1) Exploration Question and Abstract
+From what we’ve seen in the Pokemon series, Pokemon have been characterized to be cute, powerful, and humanity’s coolest friend. But would they be cute outside of the animate world? For our project, we’re trying to see the connection between human mortality causes and natural disasters--natural disasters that may occur due to Pokemon abilities. We will collect data about Pokemon, specifically, Pokemon moves and abilities, as well as the natural disasters in some certain period, and causes of deaths in that period. We will also determine the trend between Pokemon caused natural disasters and US economic growth. Our project attempts to visualize those relationships. 
+##2) Getting and Cleaning the Raw Data
+We acquired our data from 3 primary sources: 
+    1) “pokeapi.co” -- a website that contains every single detail about every single Pokemon
+    2) “emdat.be” -- a website that contains information about detahs caused by natural disasters within a certain time period and a certain region
+    3) “research.stlouisfed.org/fred2/” -- ‘FRED’ (Federal Reserve Economic Data) is a database that has information on US GDP in billions of dollars from 1947 to our current year
+##3) Clean Data Generation
+1) For Pokemon: Used the dplyr package to assign each pokemon to a single type and power metric (Attack + Sp. Attack stats) and group by types we chose to correspond to Natural disasters
+2) For Natural Disaster: Specified each disaster most precisely by type, subtype, subsubtype and pokemon type and also added a column for economic damage and casualties
+3) For Econ: The data we downloaded was an excel file, so we converted it to a “.csv” file by manually saving this file as a .csv file. We then converted the GDP column to numeric values. Finally, because the original data listed the GDP of each quarter of each year, and we decided to focus solely on annual GDP, so we only selected every 4th row (4th quarter of each year represents annual GDP)
+##4) Data Exploration
+### Gdp: 
+Our GDP data-frame has two columns for comparison, 'Year' and 'Annual GDP' (measured in billions)
+Some key statistical numbers are:
+      1) Minimum GDP is 7,800
+      2) Max GDP is 17,649 
+      3) Mean GDP is 12,932
+
+###Pokémon Data: 
+Our Pokémon data-frame has five columns for comparison:
+      1) Type (or 'species' of Pokémon)
+      2) Pokémon Count (total number of Pokémon per type)
+      3) Color (that corresponds to each type) 
+      4) Total Power (per type of Pokémon)
+      4) Avg Power (per type of Pokémon)
+
+Some interesting numbers to note: 
+1) Total Power Analysis: 
+        a) Min Power is 692 
+        b) Mean Power is 6,168 
+        c) Max Power is 15,966 
+2) Most Common Pokémon is 'water'
+3) Least Common Pokémon is 'flying'
+
+###Natural disasters:
+Our Natural Disasters dataframe similarly uses five columns for comparison:
+    1) Year
+    2) Type
+    3) Pokemon Corresponding
+    4) Casualty
+    5) Cost 
+
+Our statistical analysis:     
+1) Casualty:
+    a) Least casualty is 0
+    b) Mean casualty is 164,593
+    c) Most casualty is 11,032,692
+2) Cost: 
+    a) Least cost is 0
+    b) Mean cost is 3,960,162
+    c) Most cost is 157,530,000
+
+##5) Data Analysis and Modelling 
+#####Set Working Directory and install packages
+```{r}
+library(png)
+require(knitr)
+opts_knit$set(root.dir = getwd())
+```
+###Is there a trend between Natural Disaster and GDP?
+```{r}
+grid::grid.raster(readPNG("../images/1GDPvsYears.png" ))
+```
+Note that GDP is measured in Billions, and the Damage is measured in dollar value.
+```{r}
+grid::grid.raster(readPNG("../images/2DamagesvsYears.png" ))
+```
+There appears to be no correlation between GDP and Damages per year. Even though GDP is rising each
+year, Damages per Year does not seem to be affecting it.
+```{r}
+grid::grid.raster(readPNG("../images/10Disasters_per_Type.png" ))
+```
+
+Which Natural Disaster causes the most damage/influence in GDP?
+Well, in the previous analysis, there is no clear distinction on the relationship between GDP and Natural
+Damages year by year. Regardless, it would still be interesting to see how the yearly data of natural disasters!
+```{r}
+grid::grid.raster(readPNG("../images/3Most_Damaging_Natural_Disaster_per_Year.png" ))
+```
+Wow, now we can see obvious that for 2005, Forest Fire caused a lot of damage.In 2004, ash fall was the
+largest, and in 2012, Storm caused the next major source of damage. It should be noted that despite forest
+fires causing the most damage in 2005, the natural disaster type “storm” has the most “most damage in a
+year”. Therefore, storm yearly may create more of an impact on GDP (if natural disasters actually affect
+GDP per year).
+Now, let’s assess economic cost per disaster.
+```{r}
+grid::grid.raster(readPNG("../images/14Cost_per_Disaster.png" ))
+```
+It seems that forest fires had an abnormally large amount of costs compared with the other types of disasters.
+What about the occurences of each disaster over this period?
+```{r}
+grid::grid.raster(readPNG("../images/15Disaster_Occurences.png" ))
+```
+```{r}
+```
+Correlations between Pokemon, Natural Disasters and Economic Cost
+```{r}
+```
+Is there a correlation between types of Pokemon damage and its corresponding natural disasters?
+We can see it by comparing the types vs their power and then the types vs their economic damage
+```{r}
+```
+Pokemon Type vs Power 
+```{r}
+```
+This graph sees the relationship between type of Pokemon and their economic damage which is the corresponding economic cost that the corresponding natural disasters
+```{r}
+grid::grid.raster(readPNG("../images/4PokemonType_Power.png" ))
+```
+We can see from this graph that water type has the most power
+```{r}
+grid::grid.raster(readPNG("../images/9Avg_Pokemon_Power_per_Type.png" ))
+```
+Now we see a different trend. It seems that now dragon types have the most average power per pokemon.
+Most of the other types have a power metric around 150 units.
+But what is their correlation to economic damage?
+
+###Pokemon Type vs Economic Damage
+This graph sees the relationship between type of Pokemon and their power
+```{r}
+grid::grid.raster(readPNG("../images/5PokemonType_EconDamage.png" ))
+```
+The type that does the most economic damage is fire even though water is most powerful. It shows that pokemon power does not have a correlation to real life economic damage.
+What is the most occurring natural disaster?
+Convective storms are the most occurring natural disaster, however their economic
+damage and power are not very high. It’s corresponding Pokemon type is “flying”
+and it is the type with the least power.
+Conclusion: There is no relationship between Pokemon types’ damage and their power.
+```{r}
+grid::grid.raster(readPNG("../images/6PokemonType_Casualties.png" ))
+```
+The total variation distance is 0.
+```{r}
+grid::grid.raster(readPNG("../images/7Pokemon_per_Type.png" ))
+```
+From here, we can see that there is an overwhelming amount of water pokemon in the world and not that many flying types. All the other types have pretty much the same amount of pokemon.
+```{r}
+```
+Conclusion:
+The most important information we’ve found through this analysis is that there appears to be no relationship between natural disaster damage and GDP from year to year. One largest critique of GDP is that due to how it only measures goods and services produced in a year, damages occurred from natural disasters would actually improve the economy because goods and services used to clean up natural disasters will increase GDP--aka, increases in natural disasters creates increases in GDP. However, our data finds no direct relationship between the two; from 1995- 2015, GDP rises regardless of how natural disaster changes. 
+Our other data tries to find the relationship between the type of natural disasters and costs incurred. We’ve found that the total damage caused by type of natural disasters does not depend on the total amount of natural disasters from 1995-2015. Simultaneously, the total damage incurred in a year by natural disasters does not depend on the number of natural disasters in a year.
+Overall, we found that there is no correlation among natural disaster damage, GDP and pokemon power. However, it was interesting to note that forest fires are the most damaging natural disasters economically and casualty-wise even though convective storms, cyclone and floods were the most occurring natural disasters. When relating this to pokemon, we can also conclude that fire type pokemons are more damaging than water type pokemons even though water type pokemons are the most numerous and have the most power. It is also interesting to note that flying type pokemons, though have the least power and least population, cause the second highest economic damage. 
+To answer our original question: “What would happen if pokemon were real?”, the answer is that we should train and befriend water pokemon to negate the massive damages caused by fire pokemon--after all, fire is weak to water.
+
