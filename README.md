@@ -1,6 +1,6 @@
 ---
 title: "README"
-author: "Alice Wang, Andrew Linxie, Jerry Haoming Jiang"
+author: "Alice Wang"
 date: "December 3, 2015"
 output: html_document
 ---
@@ -34,17 +34,23 @@ MAINTAINERS
   
 ORGANIZATION
 ------------
-
+  * First extract all raw data.
   * rawdata saved in "rawdata" subdirectory
   * sources
     ~ “pokeapi.co” 
     ~ “emdat.be”
     ~ “research.stlouisfed.org/fred2/”
-  * cleaned data saved in "data" subdirectory
-  * Scripts "code" subdirectory
-  * Rmd reporting files in "report" subdirectory
-  * Graphical modelling images saved in "images" subdirectory
-
+WARNING: CHANGE DIRECTORY TO THE DIRECTORY "finalproject" IS IN 
+  * Run skeleton.R first to create directories.
+  * Run cleaningData.R in code folder
+  * Knit Modelling.rmd in code folder 
+  * Run report.rmd in report file
+      * cleaned data saved in "data" subdirectory
+      * Scripts and Report saved in "code" subdirectory
+      * Graphical modelling images saved in "images"     
+      subdirectory
+  * Open report.pdf
+  
 LIBRARIES
 ---------
 
@@ -54,7 +60,6 @@ LIBRARIES
   * "dplyr" - https://cran.r-project.org/web/packages/dplyr/in
   dex.html
     
-
 
 
 
